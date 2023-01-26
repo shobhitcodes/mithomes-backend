@@ -50,7 +50,7 @@ async function register(name, email, mobile, password, role = 'customer') {
             role,
         });
 
-        user.password = bcrypt.hash(user.password, 10);
+        user.password = await bcrypt.hash(user.password, 10);
 
         user = await user.save();
 
@@ -349,11 +349,11 @@ async function update(id, user) {
 
         user = await User.findByIdAndUpdate(id, user, {
             new: true,
-        });
+        }).lean();
 
         if (!user) throw 'user not found';
 
-        console.log({ user });
+        delete user.password;
         return user;
     } catch (err) {
         console.error('Error on update user service: ', err);
@@ -365,7 +365,8 @@ async function getById(id) {
     try {
         if (!id) throw 'id missing';
 
-        const user = await User.findById(id);
+        const user = await User.findById(id).lean();;
+        delete user.password;
         return user;
     } catch (err) {
         console.error('Error on getById user service: ', err);

@@ -57,7 +57,7 @@ async function auth(req, res) {
         const user = await userService.auth(mobile, email, password);
         const token = user.generateAuthToken();
         res.header('x-auth-token', token);
-        res.json(utils.formatResponse(1, user));
+        res.json(utils.formatResponse(1, user._id));
     } catch (err) {
         console.error('Error on auth handler: ', err);
         res.json(utils.formatResponse(0, err));

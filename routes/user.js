@@ -11,13 +11,12 @@ router.post('/auth', userController.auth); // login
 router.get('/me', auth, userController.getCurrentUser);
 
 // otp based
-router.post('/registerOTP', userController.registerOTP);
+// router.post('/registerOTP', userController.registerOTP);
 // router.post('/authOTP', userController.authOTP); // login
-router.post('/generateOTP', userController.generateOTP);
-router.post('/resendOTP', userController.resendOTP);
-
-router.post('/forgotPass', userController.forgotPass);
-router.post('/changePassword', userController.changePassword);
+// router.post('/generateOTP', userController.generateOTP);
+// router.post('/resendOTP', userController.resendOTP);
+// router.post('/forgotPass', userController.forgotPass);
+// router.post('/changePassword', userController.changePassword);
 
 router.put('/:id', auth, userController.update);
 router.get('/:id', auth, admin, userController.getById);
