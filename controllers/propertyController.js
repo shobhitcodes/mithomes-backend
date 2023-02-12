@@ -37,7 +37,7 @@ async function getAll(req, res) {
 async function getById(req, res) {
     try {
         const { id } = req.params;
-        const property = await propertyService.get(id);
+        const property = await propertyService.getById(id);
         res.json(utils.formatResponse(1, property));
     } catch (err) {
         console.error('Error on property getById handler: ', err);
@@ -88,6 +88,8 @@ async function getByProjectId(req, res) {
 async function create(req, res) {
     try {
         const data = req.body;
+        const { _id: userId } = req.user;
+        data.userId = userId;
         const property = await propertyService.create(data);
         res.json(utils.formatResponse(1, property));
     } catch (err) {

@@ -11,7 +11,6 @@ const propertySchema = new Schema(
         typeId: { type: mongoose.Types.ObjectId },
         cityId: { type: mongoose.Types.ObjectId },
         localityId: { type: mongoose.Types.ObjectId },
-        locality: String,
         type: String,
         ownershipType: String,
         bhkType: String,
