@@ -6,6 +6,7 @@ const Schema = mongoose.Schema;
 const projectSchema = new Schema(
     {
         name: { type: String },
+        userId: { type: mongoose.Types.ObjectId },
         cityId: { type: mongoose.Types.ObjectId },
         localityId: { type: mongoose.Types.ObjectId },
         location: { type: String },

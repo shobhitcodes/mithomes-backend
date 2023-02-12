@@ -6,6 +6,7 @@ const Schema = mongoose.Schema;
 const propertySchema = new Schema(
     {
         name: { type: String },
+        userId: { type: mongoose.Types.ObjectId },
         projectId: { type: mongoose.Types.ObjectId },
         cityId: { type: mongoose.Types.ObjectId },
         localityId: { type: mongoose.Types.ObjectId },
@@ -19,13 +20,5 @@ const propertySchema = new Schema(
     },
     { timestamps: true, collection: 'property' }
 );
-
-meta : {
-    bedroom
-    balcon
-    bathroom
-    car-parking
-
-}
 
 module.exports = mongoose.model('Property', propertySchema);
