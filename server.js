@@ -5,6 +5,8 @@ const mongoose = require('mongoose');
 
 const indexRouter = require('./routes/index');
 const userRouter = require('./routes/user');
+const projectRouter = require('./routes/project');
+const propertyRouter = require('./routes/property');
 
 const app = express();
 const port = process.env.PORT || 3800;
@@ -26,6 +28,8 @@ db.once('open', () => console.log('mongoose connected'));
 
 app.use('/', indexRouter);
 app.use('/api/user', userRouter);
+app.use('/api/project', projectRouter);
+app.use('/api/property', propertyRouter);
 
 app.listen(port, () => {
     console.log(`mit-homes server live on port ${port}`);

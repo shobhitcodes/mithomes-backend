@@ -7,13 +7,18 @@ const projectSchema = new Schema(
     {
         name: { type: String },
         userId: { type: mongoose.Types.ObjectId },
-        cityId: { type: mongoose.Types.ObjectId },
-        localityId: { type: mongoose.Types.ObjectId },
+        // cityId: { type: mongoose.Types.ObjectId },
+        // localityId: { type: mongoose.Types.ObjectId },
+        city: String,
+        locality: String,
+        type: String,
         location: { type: String },
         launchedDate: { type: Date },
         description: { type: String },
+        coordinates: Schema.Types.Mixed, // { lat, lng }
         active: { type: Boolean, default: true },
         deleted: { type: Boolean, default: false },
+        meta: Schema.Types.Mixed,
     },
     { timestamps: true, collection: 'project' }
 );
