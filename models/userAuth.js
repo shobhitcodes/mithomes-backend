@@ -7,7 +7,7 @@ const userAuthSchema = new Schema(
     {
         userId: { type: mongoose.Types.ObjectId, ref: user },
         otp: String,
-        mobileNo: String,
+        mobile: String,
         used: { type: Boolean, default: false },
         type: {
             type: String,

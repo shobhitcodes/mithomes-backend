@@ -1,6 +1,7 @@
 'use strict';
 
 const bcrypt = require('bcrypt');
+const axios = require('axios');
 
 // model imports
 const User = require('../models/user');
@@ -10,7 +11,7 @@ const userAuth = require('../models/userAuth');
 module.exports.register = register;
 module.exports.auth = auth;
 module.exports.getUserById = getUserById;
-module.exports.registerOTP = registerOTP;
+module.exports.OTPRegistration = OTPRegistration;
 module.exports.update = update;
 module.exports.getAllPatients = getAllPatients;
 module.exports.getAllDoctors = getAllDoctors;
@@ -20,7 +21,7 @@ module.exports.generateOTP = generateOTP;
 module.exports.resendOTP = resendOTP;
 module.exports.loginViaOTP = loginViaOTP;
 module.exports.getById = getById;
-module.exports.generateSignUpOTP = generateSignUpOTP;
+module.exports.generateRegisterOTP = generateRegisterOTP;
 module.exports.getAll = getAll;
 
 /**
@@ -112,10 +113,10 @@ async function getUserById(userId) {
     }
 }
 
-async function registerOTP(otp, mobile) {
+async function OTPRegistration(otp, mobile) {
     try {
         const _userAuth = await userAuth
-            .find({ mobileNo: mobile, type: 'register', active: true })
+            .find({ mobile, type: 'register', active: true })
             .sort({ _id: -1 })
             .limit(1);
 
@@ -143,7 +144,7 @@ async function registerOTP(otp, mobile) {
     }
 }
 
-async function generateSignUpOTP(mobile, email, name, role = 'patient') {
+async function generateRegisterOTP(mobile, email, name, role = 'customer') {
     try {
         let emailFound = email && (await User.findOne({ email }));
         let mobileFound = mobile && (await User.findOne({ mobile }));
@@ -157,27 +158,26 @@ async function generateSignUpOTP(mobile, email, name, role = 'patient') {
         }
 
         await userAuth.create({
-            otpUsed: true,
+            otpUsed: false,
             otp: otp,
             otpType: 'register',
-            mobileNo: mobile,
+            mobile,
             meta: { name, email, role },
         });
 
-        let template = 'otp-registration';
+        let template = 'SignUp for MIT-Homes';
 
-        await sendOTP(mobile, otp, template);
-
-        return true;
+        return sendOTP(mobile, otp, template);
     } catch (err) {
         console.error('Error on generateSignUpOTP service: ', err);
         throw err;
     }
 }
 
-async function generateOTP(mobileNo, type = 'Login') {
+async function generateOTP(mobile, type = 'login') {
     try {
-        let user = await User.findOne({ mobile: mobileNo });
+        let user = await User.findOne({ mobile });
+
         if (!user) throw 'Invalid mobile number';
 
         let otp = parseInt(Math.random() * 10000) + '';
@@ -191,20 +191,21 @@ async function generateOTP(mobileNo, type = 'Login') {
             otpUsed: true,
             otp: otp,
             otpType: type,
-            mobileNo,
+            mobile,
         });
 
         let template = '';
+
         if (type === 'Login') {
             template = 'OTP%20Login';
         }
         if (type === 'PasswordChange') {
             template = 'Password%20Reset%20OTP';
         }
-        const isOTPSend = await sendOTP(user.mobile, otp, template);
-        return true;
+
+        return sendOTP(mobile, otp, template);
     } catch (error) {
-        console.error('Error on login service: ', error);
+        console.error('Error on generateOTP service: ', error);
         throw error;
     }
 }
@@ -228,10 +229,11 @@ async function resendOTP(mobileNo) {
     }
 }
 
-async function sendOTP(mobileNo, otp, template) {
+async function sendOTP(mobile, otp, template) {
     try {
-        const url = `https://2factor.in/API/V1/9e6e3742-1fff-11ec-a13b-0200cd936042/SMS/+91${mobileNo}/${otp}/${template}`;
+        const url = `https://2factor.in/API/V1/c7e71955-ab14-11ed-813b-0200cd936042/SMS/+91${mobile}/${otp}/${template}`;
         const otpResponse = await axios.get(url);
+
         if (otpResponse.status === 200) {
             return true;
         } else throw otpResponse;
@@ -365,7 +367,7 @@ async function getById(id) {
     try {
         if (!id) throw 'id missing';
 
-        const user = await User.findById(id).lean();;
+        const user = await User.findById(id).lean();
         delete user.password;
         return user;
     } catch (err) {

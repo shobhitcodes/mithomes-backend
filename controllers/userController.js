@@ -7,9 +7,10 @@ const userService = require('../services/userService');
 module.exports.register = register;
 module.exports.auth = auth;
 module.exports.getCurrentUser = getCurrentUser;
-module.exports.registerOTP = registerOTP;
-module.exports.loginViaOTP = loginViaOTP;
+module.exports.generateRegisterOTP = generateRegisterOTP;
 module.exports.generateOTP = generateOTP;
+module.exports.OTPRegistration = OTPRegistration;
+module.exports.loginViaOTP = loginViaOTP;
 module.exports.resendOTP = resendOTP;
 module.exports.forgotPass = forgotPass;
 module.exports.changePassword = changePassword;
@@ -17,7 +18,6 @@ module.exports.getAllPatients = getAllPatients;
 module.exports.getAllDoctors = getAllDoctors;
 module.exports.update = update;
 module.exports.getById = getById;
-module.exports.generateSignUpOTP = generateSignUpOTP;
 module.exports.getAll = getAll;
 
 /**
@@ -81,54 +81,48 @@ async function getCurrentUser(req, res) {
     }
 }
 
+async function generateOTP(req, res) {
+    try {
+        const { mobile } = req.body;
+        const otp = await userService.generateOTP(mobile);
+        res.json(utils.formatResponse(1, otp));
+    } catch (err) {
+        console.error('Error on generateOTP handler: ', err);
+        res.json(utils.formatResponse(0, err));
+    }
+}
+
 /**
  * @async
  * @description Request handler for user otp registration
  * @param {Express.Request} req
  * @param {Express.Response} res
  */
-async function registerOTP(req, res) {
+async function OTPRegistration(req, res) {
     try {
         const { mobile, otp } = req.body;
-        const user = await userService.registerOTP(otp, mobile);
+        const user = await userService.OTPRegistration(otp, mobile);
         const token = user.generateAuthToken();
         res.header('x-auth-token', token);
         res.json(utils.formatResponse(1, user._id));
     } catch (err) {
-        console.error('Error on registerOTP handler: ', err);
+        console.error('Error on OTPRegistration handler: ', err);
         res.json(utils.formatResponse(0, err));
     }
 }
 
-/**
- * @async
- * @description Request handler for user login verification
- * @param {Express.Request} req
- * @param {Express.Response} res
- */
-async function generateOTP(req, res) {
-    try {
-        const { mobileNo } = req.body;
-        const otpGenerated = await userService.generateOTP(mobileNo);
-        res.json(utils.formatResponse(1, otpGenerated));
-    } catch (err) {
-        console.error('Error on login handler: ', err);
-        res.json(utils.formatResponse(0, err));
-    }
-}
-
-async function generateSignUpOTP(req, res) {
+async function generateRegisterOTP(req, res) {
     try {
         const { mobile, email, name, role } = req.body;
-        const otpGenerated = await userService.generateSignUpOTP(
+        const otp = await userService.generateRegisterOTP(
             mobile,
             email,
             name,
             role
         );
-        res.json(utils.formatResponse(1, otpGenerated));
+        res.json(utils.formatResponse(1, otp));
     } catch (err) {
-        console.error('Error on generateSignUpOTP handler: ', err);
+        console.error('Error on generateRegisterOTP handler: ', err);
         res.json(utils.formatResponse(0, err));
     }
 }
