@@ -14,10 +14,10 @@ router.get('/me', auth, userController.getCurrentUser);
 router.post('/generateRegisterOTP', userController.generateRegisterOTP);
 router.post('/OTPRegistration', userController.OTPRegistration);
 router.post('/generateOTP', userController.generateOTP);
-// router.post('/authOTP', userController.authOTP); // login
+router.post('/authOTP', userController.OTPAuth); // login
 // router.post('/resendOTP', userController.resendOTP);
-// router.post('/forgotPass', userController.forgotPass);
-// router.post('/changePassword', userController.changePassword);
+router.post('/forgotPass', userController.forgotPass);
+router.post('/changePassword', userController.changePassword);
 
 router.put('/:id', auth, userController.update);
 router.get('/:id', auth, admin, userController.getById);

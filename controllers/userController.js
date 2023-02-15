@@ -10,7 +10,7 @@ module.exports.getCurrentUser = getCurrentUser;
 module.exports.generateRegisterOTP = generateRegisterOTP;
 module.exports.generateOTP = generateOTP;
 module.exports.OTPRegistration = OTPRegistration;
-module.exports.loginViaOTP = loginViaOTP;
+module.exports.OTPAuth = OTPAuth;
 module.exports.resendOTP = resendOTP;
 module.exports.forgotPass = forgotPass;
 module.exports.changePassword = changePassword;
@@ -133,15 +133,15 @@ async function generateRegisterOTP(req, res) {
  * @param {Express.Request} req
  * @param {Express.Response} res
  */
-async function loginViaOTP(req, res) {
+async function OTPAuth(req, res) {
     try {
-        const { mobileNo, otp } = req.body;
-        const user = await userService.loginViaOTP(otp, mobileNo);
+        const { mobile, otp } = req.body;
+        const user = await userService.OTPAuth(otp, mobile);
         const token = user.generateAuthToken();
         res.header('x-auth-token', token);
-        res.json(utils.formatResponse(1, user));
+        res.json(utils.formatResponse(1, user._id));
     } catch (err) {
-        console.error('Error on login handler: ', err);
+        console.error('Error on OTPAuth handler: ', err);
         res.json(utils.formatResponse(0, err));
     }
 }
@@ -174,7 +174,7 @@ async function forgotPass(req, res) {
         const forgotPassVal = await userService.forgotPassword(mobile);
         res.json(utils.formatResponse(1, forgotPassVal));
     } catch (err) {
-        console.error('Error on register handler: ', err);
+        console.error('Error on forgotPass handler: ', err);
         res.json(utils.formatResponse(0, err));
     }
 }
@@ -188,7 +188,7 @@ async function changePassword(req, res) {
             otp,
             newPassword
         );
-        res.json(utils.formatResponse(1, newPasswordSaved));
+        res.json(utils.formatResponse(1));
     } catch (err) {
         console.error('Error on register handler: ', err);
         res.json(utils.formatResponse(0, err));

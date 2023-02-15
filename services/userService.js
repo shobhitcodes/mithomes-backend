@@ -19,7 +19,7 @@ module.exports.changePassword = changePassword;
 module.exports.forgotPassword = forgotPassword;
 module.exports.generateOTP = generateOTP;
 module.exports.resendOTP = resendOTP;
-module.exports.loginViaOTP = loginViaOTP;
+module.exports.OTPAuth = OTPAuth;
 module.exports.getById = getById;
 module.exports.generateRegisterOTP = generateRegisterOTP;
 module.exports.getAll = getAll;
@@ -188,7 +188,7 @@ async function generateOTP(mobile, type = 'login') {
 
         const _userAuth = await userAuth.create({
             userId: user._id,
-            otpUsed: true,
+            otpUsed: false,
             otp: otp,
             otpType: type,
             mobile,
@@ -243,21 +243,24 @@ async function sendOTP(mobile, otp, template) {
     }
 }
 
-async function loginViaOTP(otp, mobileNo) {
+async function OTPAuth(otp, mobile) {
     try {
         const _userAuth = await userAuth
-            .find({ mobileNo, active: true, otpType: 'Login' })
+            .find({ mobile, active: true, otpType: 'login' })
             .sort({ _id: -1 })
             .limit(1);
         if (!_userAuth) throw 'Invalid Mobile Number Or OTP';
         if (!_userAuth[0]) throw 'Invalid Mobile Number Or OTP';
         if (_userAuth[0].otp !== otp) throw 'Invalid OTP';
 
-        await userAuth.updateOne({ _id: _userAuth[0]._id }, { active: false });
+        await userAuth.updateOne({ _id: _userAuth[0]._id }, { used: true, active: false });
 
-        const user = await User.findOne({ mobile: mobileNo, active: true });
+        const user = await User.findOne({ mobile, active: true });
+
         if (!user) throw 'Invalid User';
+
         delete user.password;
+
         return user;
     } catch (error) {
         console.error(error);
@@ -313,7 +316,7 @@ async function forgotPassword(mobile) {
     try {
         const user = await User.findOne({ mobile, active: true });
         if (!user) throw 'Invalid Mobile Number';
-        return generateOTP(mobile, 'PasswordChange');
+        return generateOTP(mobile, 'passwordChange');
     } catch (error) {
         console.error('Error on User service: ', error);
         throw error;
@@ -324,7 +327,7 @@ async function changePassword(mobileNo, otp, newPassword) {
     try {
         const otpAuth = await userAuth.find({
             mobileNo,
-            otpType: 'PasswordChange',
+            otpType: 'passwordChange',
             active: true,
         });
 
@@ -334,7 +337,7 @@ async function changePassword(mobileNo, otp, newPassword) {
 
         otpAuth[0].active = false;
         otpAuth[0].save();
-        const user = await User.findOne({ mobile: mobileNo, active: true });
+        const user = await User.findOne({ mobile, active: true });
         user.password = await bcrypt.hash(newPassword, 10);
 
         await user.save();
