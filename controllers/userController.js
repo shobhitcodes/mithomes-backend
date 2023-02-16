@@ -113,12 +113,12 @@ async function OTPRegistration(req, res) {
 
 async function generateRegisterOTP(req, res) {
     try {
-        const { mobile, email, name, pass, role } = req.body;
+        const { mobile, email, name, password, role } = req.body;
         const otp = await userService.generateRegisterOTP(
             mobile,
             email,
             name,
-            pass,
+            password,
             role
         );
         res.json(utils.formatResponse(1, otp));
@@ -165,7 +165,7 @@ async function resendOTP(req, res) {
 }
 /**
  * @async
- * @description Request handler for resetting user pass
+ * @description Request handler for resetting user password
  * @param {Express.Request} req
  * @param {Express.Response} res
  */

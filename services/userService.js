@@ -138,7 +138,7 @@ async function OTPRegistration(otp, mobile) {
             ...userDetails,
         });
 
-        user.password = await bcrypt.hash(userDetails.pass, 10);
+        user.password = await bcrypt.hash(userDetails.password, 10);
 
         user = await user.save();
 
@@ -151,7 +151,7 @@ async function OTPRegistration(otp, mobile) {
     }
 }
 
-async function generateRegisterOTP(mobile, email, name, pass, role = 'customer') {
+async function generateRegisterOTP(mobile, email, name, password, role = 'customer') {
     try {
         let emailFound = email && (await User.findOne({ email }));
         let mobileFound = mobile && (await User.findOne({ mobile }));
@@ -169,7 +169,7 @@ async function generateRegisterOTP(mobile, email, name, pass, role = 'customer')
             otp: otp,
             type: 'register',
             mobile,
-            meta: { name, email, pass, role },
+            meta: { name, email, password, role },
         });
 
         let template = 'SignUp for MIT-Homes';
@@ -238,7 +238,7 @@ async function resendOTP(mobileNo) {
 
 async function sendOTP(mobile, otp, template) {
     try {
-        const url = `https://2factor.in/API/V1/c7e71955-ab14-11ed-813b-0200cd936042/SMS/+91${mobile}/${otp}/${template}`;
+        const url = `https://2factor.in/API/V1/${process.env.2FACTOR_API_KEY}/SMS/+91${mobile}/${otp}/${template}`;
         const otpResponse = await axios.get(url);
 
         if (otpResponse.status === 200) {
