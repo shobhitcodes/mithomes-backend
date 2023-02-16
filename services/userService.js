@@ -238,7 +238,7 @@ async function resendOTP(mobileNo) {
 
 async function sendOTP(mobile, otp, template) {
     try {
-        const url = `https://2factor.in/API/V1/${process.env.2FACTOR_API_KEY}/SMS/+91${mobile}/${otp}/${template}`;
+        const url = `https://2factor.in/API/V1/${process.env.SMS_API_KEY}/SMS/+91${mobile}/${otp}/${template}`;
         const otpResponse = await axios.get(url);
 
         if (otpResponse.status === 200) {
