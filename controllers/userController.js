@@ -113,11 +113,12 @@ async function OTPRegistration(req, res) {
 
 async function generateRegisterOTP(req, res) {
     try {
-        const { mobile, email, name, role } = req.body;
+        const { mobile, email, name, pass, role } = req.body;
         const otp = await userService.generateRegisterOTP(
             mobile,
             email,
             name,
+            pass,
             role
         );
         res.json(utils.formatResponse(1, otp));
@@ -183,7 +184,7 @@ async function changePassword(req, res) {
     try {
         const { mobile, otp, newPassword } = req.body;
 
-        const newPasswordSaved = await userService.changePassword(
+        await userService.changePassword(
             mobile,
             otp,
             newPassword

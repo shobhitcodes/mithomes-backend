@@ -116,9 +116,10 @@ async function getUserById(userId) {
 async function OTPRegistration(otp, mobile) {
     try {
         const _userAuth = await userAuth
-            .find({ mobile, type: 'register', active: true })
+            .find({ mobile, type: 'register', active: true, used: false })
             .sort({ _id: -1 })
             .limit(1);
+        
 
         if (!_userAuth) throw 'Invalid mobile number or OTP';
         if (!_userAuth[0]) throw 'Invalid mobile number or OTP';
@@ -129,13 +130,19 @@ async function OTPRegistration(otp, mobile) {
             { used: true, active: false }
         );
 
+        const userDetails = _userAuth[0].meta;
+
         // creating new user
         let user = new User({
             mobile,
-            ..._userAuth[0].meta,
+            ...userDetails,
         });
 
+        user.password = await bcrypt.hash(userDetails.pass, 10);
+
         user = await user.save();
+
+        delete user.password;
 
         return user;
     } catch (error) {
@@ -144,7 +151,7 @@ async function OTPRegistration(otp, mobile) {
     }
 }
 
-async function generateRegisterOTP(mobile, email, name, role = 'customer') {
+async function generateRegisterOTP(mobile, email, name, pass, role = 'customer') {
     try {
         let emailFound = email && (await User.findOne({ email }));
         let mobileFound = mobile && (await User.findOne({ mobile }));
@@ -160,9 +167,9 @@ async function generateRegisterOTP(mobile, email, name, role = 'customer') {
         await userAuth.create({
             otpUsed: false,
             otp: otp,
-            otpType: 'register',
+            type: 'register',
             mobile,
-            meta: { name, email, role },
+            meta: { name, email, pass, role },
         });
 
         let template = 'SignUp for MIT-Homes';
@@ -190,7 +197,7 @@ async function generateOTP(mobile, type = 'login') {
             userId: user._id,
             otpUsed: false,
             otp: otp,
-            otpType: type,
+            type: type,
             mobile,
         });
 
@@ -246,7 +253,7 @@ async function sendOTP(mobile, otp, template) {
 async function OTPAuth(otp, mobile) {
     try {
         const _userAuth = await userAuth
-            .find({ mobile, active: true, otpType: 'login' })
+            .find({ mobile, active: true, type: 'login' })
             .sort({ _id: -1 })
             .limit(1);
         if (!_userAuth) throw 'Invalid Mobile Number Or OTP';
@@ -327,7 +334,7 @@ async function changePassword(mobileNo, otp, newPassword) {
     try {
         const otpAuth = await userAuth.find({
             mobileNo,
-            otpType: 'passwordChange',
+            type: 'passwordChange',
             active: true,
         });
 
