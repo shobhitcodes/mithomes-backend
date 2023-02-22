@@ -42,20 +42,15 @@ async function register(name, email, mobile, password, role = 'customer') {
 
         if (emailFound || mobileFound) throw 'User already registered';
 
-        // creating new user
-        let user = new User({
+        let user = {
             name,
             email,
             password,
             mobile,
             role,
-        });
+        };
 
-        user.password = await bcrypt.hash(user.password, 10);
-
-        user = await user.save();
-
-        delete user.password;
+        user = await create(user);
 
         return user;
     } catch (err) {
@@ -116,7 +111,7 @@ async function getUserById(userId) {
 async function OTPRegistration(otp, mobile) {
     try {
         const _userAuth = await userAuth
-            .find({ mobile, type: 'register', active: true, used: false })
+            .find({ mobile, type: 'register', active: true })
             .sort({ _id: -1 })
             .limit(1);
         
@@ -127,22 +122,17 @@ async function OTPRegistration(otp, mobile) {
 
         await userAuth.updateOne(
             { _id: _userAuth[0]._id },
-            { used: true, active: false }
+            { active: false }
         );
 
         const userDetails = _userAuth[0].meta;
 
-        // creating new user
-        let user = new User({
+        let user = {
             mobile,
             ...userDetails,
-        });
+        };
 
-        user.password = await bcrypt.hash(userDetails.password, 10);
-
-        user = await user.save();
-
-        delete user.password;
+        user = await create(user);
 
         return user;
     } catch (error) {
@@ -183,6 +173,8 @@ async function generateRegisterOTP(mobile, email, name, password, role = 'custom
 
 async function generateOTP(mobile, type = 'login') {
     try {
+        console.log('here101');
+
         let user = await User.findOne({ mobile });
 
         if (!user) throw 'Invalid mobile number';
@@ -200,6 +192,8 @@ async function generateOTP(mobile, type = 'login') {
             type: type,
             mobile,
         });
+
+        console.log({ _userAuth });
 
         let template = '';
 
@@ -260,7 +254,7 @@ async function OTPAuth(otp, mobile) {
         if (!_userAuth[0]) throw 'Invalid Mobile Number Or OTP';
         if (_userAuth[0].otp !== otp) throw 'Invalid OTP';
 
-        await userAuth.updateOne({ _id: _userAuth[0]._id }, { used: true, active: false });
+        await userAuth.updateOne({ _id: _userAuth[0]._id }, { active: false });
 
         const user = await User.findOne({ mobile, active: true });
 
@@ -323,6 +317,7 @@ async function forgotPassword(mobile) {
     try {
         const user = await User.findOne({ mobile, active: true });
         if (!user) throw 'Invalid Mobile Number';
+        console.log({mobile, user});
         return generateOTP(mobile, 'passwordChange');
     } catch (error) {
         console.error('Error on User service: ', error);
@@ -330,10 +325,10 @@ async function forgotPassword(mobile) {
     }
 }
 
-async function changePassword(mobileNo, otp, newPassword) {
+async function changePassword(mobile, otp, newPassword) {
     try {
         const otpAuth = await userAuth.find({
-            mobileNo,
+            mobile,
             type: 'passwordChange',
             active: true,
         });
@@ -392,6 +387,26 @@ async function getAll() {
         return users;
     } catch (err) {
         console.error('Error on getAll user service: ', err);
+        throw err;
+    }
+}
+
+async function create(user) {
+    try {
+        if (!user) throw 'required data missing';
+
+        user = new User(user);
+        user.password = await bcrypt.hash(user.password, 10);
+        user = await user.save();
+        delete user.password;
+
+        if (user.role === 'reseller') {
+            await resellerService.create({ userId: user._id });
+        }
+
+        return user;
+    } catch (err) {
+        console.error('Error on create user service: ', err);
         throw err;
     }
 }

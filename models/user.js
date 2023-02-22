@@ -23,7 +23,7 @@ const userSchema = new Schema(
             text: { type: Boolean, default: true },
             email: { type: Boolean, default: true },
         },
-        role: { type: String, enum: ['customer', 'broker', 'admin'] },
+        role: { type: String, enum: ['reseller', 'builder', 'admin'] },
         active: { type: Boolean, default: true },
         deleted: { type: Boolean, default: false },
         password: String,

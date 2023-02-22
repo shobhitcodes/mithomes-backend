@@ -8,7 +8,7 @@ const userAuthSchema = new Schema(
         userId: { type: mongoose.Types.ObjectId, ref: user },
         otp: String,
         mobile: String,
-        used: { type: Boolean, default: false },
+        // used: { type: Boolean, default: false },
         type: {
             type: String,
             enum: ['login', 'register', 'passwordChange'],
