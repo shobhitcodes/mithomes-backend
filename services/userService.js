@@ -114,16 +114,12 @@ async function OTPRegistration(otp, mobile) {
             .find({ mobile, type: 'register', active: true })
             .sort({ _id: -1 })
             .limit(1);
-        
 
         if (!_userAuth) throw 'Invalid mobile number or OTP';
         if (!_userAuth[0]) throw 'Invalid mobile number or OTP';
         if (_userAuth[0].otp !== otp) throw 'Invalid OTP';
 
-        await userAuth.updateOne(
-            { _id: _userAuth[0]._id },
-            { active: false }
-        );
+        await userAuth.updateOne({ _id: _userAuth[0]._id }, { active: false });
 
         const userDetails = _userAuth[0].meta;
 
@@ -141,7 +137,13 @@ async function OTPRegistration(otp, mobile) {
     }
 }
 
-async function generateRegisterOTP(mobile, email, name, password, role = 'customer') {
+async function generateRegisterOTP(
+    mobile,
+    email,
+    name,
+    password,
+    role = 'customer'
+) {
     try {
         let emailFound = email && (await User.findOne({ email }));
         let mobileFound = mobile && (await User.findOne({ mobile }));
@@ -317,7 +319,7 @@ async function forgotPassword(mobile) {
     try {
         const user = await User.findOne({ mobile, active: true });
         if (!user) throw 'Invalid Mobile Number';
-        console.log({mobile, user});
+        console.log({ mobile, user });
         return generateOTP(mobile, 'passwordChange');
     } catch (error) {
         console.error('Error on User service: ', error);
@@ -327,18 +329,17 @@ async function forgotPassword(mobile) {
 
 async function changePassword(mobile, otp, newPassword) {
     try {
-        const otpAuth = await userAuth.find({
-            mobile,
-            type: 'passwordChange',
-            active: true,
-        });
+        const _userAuth = await userAuth
+            .find({ mobile, type: 'passwordChange', active: true })
+            .sort({ _id: -1 })
+            .limit(1);
 
-        if (!otpAuth) throw 'Invalid Mobile Number Or OTP';
-        if (!otpAuth[0]) throw 'Invalid Mobile Number Or OTP';
-        if (otpAuth[0].otp !== otp) throw 'Invalid OTP';
+        if (!_userAuth) throw 'Invalid mobile number or OTP';
+        if (!_userAuth[0]) throw 'Invalid mobile number or OTP';
+        if (_userAuth[0].otp !== otp) throw 'Invalid OTP';
 
-        otpAuth[0].active = false;
-        otpAuth[0].save();
+        await userAuth.updateOne({ _id: _userAuth[0]._id }, { active: false });
+
         const user = await User.findOne({ mobile, active: true });
         user.password = await bcrypt.hash(newPassword, 10);
 
