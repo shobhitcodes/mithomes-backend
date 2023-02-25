@@ -19,6 +19,14 @@ const projectSchema = new Schema(
         active: { type: Boolean, default: true },
         deleted: { type: Boolean, default: false },
         meta: Schema.Types.Mixed,
+        localityDetails: {
+            city: String,
+            locality: Number,
+            street: Number,
+            lat: String,
+            lng: String,
+            other: String,
+        }, 
     },
     { timestamps: true, collection: 'project' }
 );
