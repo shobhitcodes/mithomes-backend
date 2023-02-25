@@ -5,6 +5,7 @@ const { auth } = require('../middlewares/auth');
 const multer = require('multer');
 // const upload = multer({ dest: 'uploads/' });
 const File = require('../models/file');
+const utils = require('../helpers/utils');
 
 //Configuration for Multer
 const multerStorage = multer.diskStorage({
@@ -24,18 +25,18 @@ const upload = multer({
 // routes
 router.post('/uploadFile', auth, upload.any('fileUpload'), async (req, res) => {
     try {
+        const files = [];
+
         if (req.files.length) {
             for (const file of req.files) {
-                await File.create({
+                const file = await File.create({
                     name: file.filename,
                 });
+                files.push(file);
             }
         }
 
-        res.status(200).json({
-            status: 'success',
-            message: 'File created successfully!!',
-        });
+        res.json(utils.formatResponse(1, files));
     } catch (error) {
         res.json({
             error,
@@ -46,10 +47,7 @@ router.post('/uploadFile', auth, upload.any('fileUpload'), async (req, res) => {
 router.get('/getFiles', async (req, res) => {
     try {
         const files = await File.find();
-        res.status(200).json({
-            status: 'success',
-            files,
-        });
+        res.json(utils.formatResponse(1, files));
     } catch (error) {
         res.json({
             status: 'Fail',
