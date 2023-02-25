@@ -8,6 +8,7 @@ const indexRouter = require('./routes/index');
 const userRouter = require('./routes/user');
 const projectRouter = require('./routes/project');
 const propertyRouter = require('./routes/property');
+const builderRouter = require('./routes/builder');
 const fileRouter = require('./routes/file');
 
 const app = express();
@@ -36,6 +37,7 @@ app.use('/', indexRouter);
 app.use('/api/user', userRouter);
 app.use('/api/project', projectRouter);
 app.use('/api/property', propertyRouter);
+app.use('/api/builder', builderRouter);
 app.use('/api/file', fileRouter);
 
 app.listen(port, () => {
