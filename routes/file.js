@@ -55,7 +55,7 @@ router.post(
     }
 );
 
-router.get('/api/getFiles', async (req, res) => {
+router.get('/getFiles', async (req, res) => {
     try {
         const files = await File.find();
         res.status(200).json({
