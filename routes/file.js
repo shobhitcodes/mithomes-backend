@@ -33,7 +33,7 @@ const upload = multer({
 
 //API Endpoint for uploading file
 router.post(
-    '/api/uploadFile',
+    '/uploadFile',
     auth,
     upload.single('fileUpload'),
     async (req, res) => {
