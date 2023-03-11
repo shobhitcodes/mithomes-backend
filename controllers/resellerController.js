@@ -13,6 +13,9 @@ module.exports.getAllLeads = getAllLeads;
 module.exports.createListingRequest = createListingRequest;
 module.exports.getAllListingRequests = getAllListingRequests;
 module.exports.markListingRequestComplete = markListingRequestComplete;
+module.exports.getWhishList = getWhishList;
+module.exports.addFavourite = addFavourite;
+module.exports.removeFavourite = removeFavourite;
 
 /**
  * @async
@@ -124,6 +127,40 @@ async function markListingRequestComplete(req, res) {
             'Error on reseller markListingRequestComplete handler: ',
             err
         );
+        res.json(utils.formatResponse(0, err));
+    }
+}
+
+async function getWhishList(req, res) {
+    try {
+        const { _id: userId } = req.user;
+        const whishList = await resellerService.getWhishList(userId);
+        res.json(utils.formatResponse(1, whishList));
+    } catch (err) {
+        console.error('Error on reseller getWhishList handler: ', err);
+        res.json(utils.formatResponse(0, err));
+    }
+}
+
+async function addFavourite(req, res) {
+    try {
+        const { propertyId } = req.params;
+        const { _id: userId } = req.user;
+        await resellerService.addFavourite(userId, propertyId);
+        res.json(utils.formatResponse(1));
+    } catch (err) {
+        console.error('Error on reseller addFavourite handler: ', err);
+        res.json(utils.formatResponse(0, err));
+    }
+}
+async function removeFavourite(req, res) {
+    try {
+        const { propertyId } = req.params;
+        const { _id: userId } = req.user;
+        await resellerService.removeFavourite(userId, propertyId);
+        res.json(utils.formatResponse(1));
+    } catch (err) {
+        console.error('Error on reseller removeFavourite handler: ', err);
         res.json(utils.formatResponse(0, err));
     }
 }

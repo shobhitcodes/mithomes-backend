@@ -4,6 +4,7 @@
 const Reseller = require('../models/reseller');
 const Lead = require('../models/lead');
 const ListingRequest = require('../models/listingRequest');
+const WhishList = require('../models/whishList');
 
 // public interface
 module.exports.create = create;
@@ -16,6 +17,9 @@ module.exports.getAllLeads = getAllLeads;
 module.exports.createListingRequest = createListingRequest;
 module.exports.getAllListingRequests = getAllListingRequests;
 module.exports.markListingRequestComplete = markListingRequestComplete;
+module.exports.getWhishList = getWhishList;
+module.exports.addFavourite = addFavourite;
+module.exports.removeFavourite = removeFavourite;
 
 async function create(reseller) {
     try {
@@ -142,6 +146,45 @@ async function markListingRequestComplete(listingId) {
             'Error on markListingRequestComplete reseller service: ',
             err
         );
+        throw err;
+    }
+}
+
+async function getWhishList(userId) {
+    try {
+        if (!userId) throw 'required data missing';
+
+        return WhishList.find({ userId });
+    } catch (err) {
+        console.error('Error on getWhishList reseller service: ', err);
+        throw err;
+    }
+}
+
+async function addFavourite(userId, propertyId) {
+    try {
+        if (!userId || !propertyId) throw 'required data missing';
+
+        const alreadyFavourite = (await WhishList.find({ userId, propertyId }))
+            .length;
+
+        if (alreadyFavourite) throw 'Already present in whishlist';
+
+        const whishList = new WhishList({ userId, propertyId });
+        return whishList.save();
+    } catch (err) {
+        console.error('Error on addFavourite reseller service: ', err);
+        throw err;
+    }
+}
+
+async function removeFavourite(userId, propertyId) {
+    try {
+        if (!userId || !propertyId) throw 'required data missing';
+
+        return WhishList.deleteOne({ userId, propertyId});
+    } catch (err) {
+        console.error('Error on removeFavourite reseller service: ', err);
         throw err;
     }
 }

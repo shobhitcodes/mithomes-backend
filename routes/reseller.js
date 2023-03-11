@@ -20,4 +20,9 @@ router.post('/listingRequest', auth, resellerController.createListingRequest);
 router.get('/listingRequest', auth, admin, resellerController.getAllListingRequests);
 router.patch('/listingRequest/markComplete/:listingId', auth, admin, resellerController.markListingRequestComplete);
 
+// whishlist
+router.get('/whishlist', auth, resellerController.getWhishList);
+router.post('/whishlist/addFavourite/:propertyId', auth, resellerController.addFavourite);
+router.post('/whishlist/removeFavourite/:propertyId', auth, resellerController.removeFavourite);
+
 module.exports = router;
