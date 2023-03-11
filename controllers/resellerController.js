@@ -6,6 +6,13 @@ const resellerService = require('../services/resellerService');
 // public interface
 module.exports.getByUserId = getByUserId;
 module.exports.update = update;
+module.exports.createLead = createLead;
+module.exports.getLeadsByPropertyId = getLeadsByPropertyId;
+module.exports.getLeads = getLeads;
+module.exports.getAllLeads = getAllLeads;
+module.exports.createListingRequest = createListingRequest;
+module.exports.getAllListingRequests = getAllListingRequests;
+module.exports.markListingRequestComplete = markListingRequestComplete;
 
 /**
  * @async
@@ -38,6 +45,85 @@ async function update(req, res) {
         res.json(utils.formatResponse(1, reseller));
     } catch (err) {
         console.error('Error on reseller update handler: ', err);
+        res.json(utils.formatResponse(0, err));
+    }
+}
+
+async function createLead(req, res) {
+    try {
+        const { propertyId } = req.params;
+        const { _id: userId } = req.user;
+        await resellerService.createLead(userId, propertyId);
+        res.json(utils.formatResponse(1));
+    } catch (err) {
+        console.error('Error on reseller createLead handler: ', err);
+        res.json(utils.formatResponse(0, err));
+    }
+}
+
+async function getLeadsByPropertyId(req, res) {
+    try {
+        const { propertyId } = req.params;
+        const leads = await resellerService.getLeadsByPropertyId(propertyId);
+        res.json(utils.formatResponse(1, leads));
+    } catch (err) {
+        console.error('Error on reseller getLeadsByPropertyId handler: ', err);
+        res.json(utils.formatResponse(0, err));
+    }
+}
+
+async function getLeads(req, res) {
+    try {
+        const { _id: userId } = req.user;
+        const leads = await resellerService.getLeads(userId);
+        res.json(utils.formatResponse(1, leads));
+    } catch (err) {
+        console.error('Error on reseller getLeads handler: ', err);
+        res.json(utils.formatResponse(0, err));
+    }
+}
+
+async function getAllLeads(req, res) {
+    try {
+        const leads = await resellerService.getAllLeads();
+        res.json(utils.formatResponse(1, leads));
+    } catch (err) {
+        console.error('Error on reseller getAllLeads handler: ', err);
+        res.json(utils.formatResponse(0, err));
+    }
+}
+
+async function createListingRequest(req, res) {
+    try {
+        const { _id: userId } = req.user;
+        await resellerService.createListingRequest(userId);
+        res.json(utils.formatResponse(1));
+    } catch (err) {
+        console.error('Error on reseller createListingRequest handler: ', err);
+        res.json(utils.formatResponse(0, err));
+    }
+}
+
+async function getAllListingRequests(req, res) {
+    try {
+        const listingRequests = await resellerService.getAllListingRequests();
+        res.json(utils.formatResponse(1, listingRequests));
+    } catch (err) {
+        console.error('Error on reseller getAllListingRequests handler: ', err);
+        res.json(utils.formatResponse(0, err));
+    }
+}
+
+async function markListingRequestComplete(req, res) {
+    try {
+        const { listingId } = req.params;
+        await resellerService.markListingRequestComplete(listingId);
+        res.json(utils.formatResponse(1));
+    } catch (err) {
+        console.error(
+            'Error on reseller markListingRequestComplete handler: ',
+            err
+        );
         res.json(utils.formatResponse(0, err));
     }
 }

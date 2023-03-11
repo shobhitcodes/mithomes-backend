@@ -9,6 +9,7 @@ const userController = require('../controllers/userController');
 router.post('/register', userController.register);
 router.post('/auth', userController.auth); // login
 router.get('/me', auth, userController.getCurrentUser);
+router.post('/create', auth, admin, userController.create);
 
 // otp based
 router.post('/generateRegisterOTP', userController.generateRegisterOTP);

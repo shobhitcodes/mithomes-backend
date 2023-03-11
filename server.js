@@ -10,6 +10,7 @@ const projectRouter = require('./routes/project');
 const propertyRouter = require('./routes/property');
 const builderRouter = require('./routes/builder');
 const fileRouter = require('./routes/file');
+const resellerRouter = require('./routes/reseller');
 
 const app = express();
 const port = process.env.PORT || 3800;
@@ -39,6 +40,7 @@ app.use('/api/project', projectRouter);
 app.use('/api/property', propertyRouter);
 app.use('/api/builder', builderRouter);
 app.use('/api/file', fileRouter);
+app.use('/api/reseller', resellerRouter);
 
 app.listen(port, () => {
     console.log(`mit-homes server live on port ${port}`);

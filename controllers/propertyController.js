@@ -7,6 +7,9 @@ const propertyService = require('../services/propertyService');
 module.exports.getById = getById;
 module.exports.getByUserId = getByUserId;
 module.exports.getByProjectId = getByProjectId;
+module.exports.getCity = getCity;
+module.exports.getByType = getByType;
+module.exports.getByFilter = getByFilter;
 module.exports.getAll = getAll;
 module.exports.create = create;
 module.exports.update = update;
@@ -75,6 +78,39 @@ async function getByProjectId(req, res) {
         res.json(utils.formatResponse(1, properties));
     } catch (err) {
         console.error('Error on property getByProjectId handler: ', err);
+        res.json(utils.formatResponse(0, err));
+    }
+}
+
+async function getCity(req, res) {
+    try {
+        const { city } = req.body;
+        const properties = await propertyService.getCity(city);
+        res.json(utils.formatResponse(1, properties));
+    } catch (err) {
+        console.error('Error on property getCity handler: ', err);
+        res.json(utils.formatResponse(0, err));
+    }
+}
+
+async function getByType(req, res) {
+    try {
+        const { type } = req.body;
+        const properties = await propertyService.getByType(type);
+        res.json(utils.formatResponse(1, properties));
+    } catch (err) {
+        console.error('Error on property getByType handler: ', err);
+        res.json(utils.formatResponse(0, err));
+    }
+}
+
+async function getByFilter(req, res) {
+    try {
+        const filter = req.body;
+        const properties = await propertyService.getByFilter(filter);
+        res.json(utils.formatResponse(1, properties));
+    } catch (err) {
+        console.error('Error on property getByFilter handler: ', err);
         res.json(utils.formatResponse(0, err));
     }
 }

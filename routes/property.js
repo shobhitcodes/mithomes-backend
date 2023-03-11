@@ -11,5 +11,8 @@ router.get('/getByUser/:id', auth, propertyController.getByUserId);
 router.get('/getByProject/:id', auth, propertyController.getByProjectId);
 router.put('/:id', auth, propertyController.update);
 router.delete('/:id', auth, propertyController.deleteOne);
+router.post('/getCity', propertyController.getCity);
+router.post('/getByType', propertyController.getByType);
+router.post('/getByFilter', propertyController.getByFilter);
 
 module.exports = router;

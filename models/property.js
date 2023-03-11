@@ -11,7 +11,7 @@ const propertySchema = new Schema(
         typeId: { type: mongoose.Types.ObjectId },
         cityId: { type: mongoose.Types.ObjectId },
         localityId: { type: mongoose.Types.ObjectId },
-        type: String,
+        type: String, // villa, flat, house, office space, plot, land, condo, penthouse
         ownershipType: String,
         bhkType: String,
         plotArea: Number, // in sq.ft
@@ -48,8 +48,8 @@ const propertySchema = new Schema(
         },
         localityDetails: {
             city: String,
-            locality: Number,
-            street: Number,
+            locality: String,
+            street: String,
             lat: String,
             lng: String,
             other: String,
@@ -71,6 +71,7 @@ const propertySchema = new Schema(
             parking: String,
             propDesc: String,
         },
+        adminApproval: { type: Boolean, default: false },
     },
     { timestamps: true, collection: 'property' }
 );

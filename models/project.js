@@ -27,6 +27,7 @@ const projectSchema = new Schema(
             lng: String,
             other: String,
         }, 
+        pictures: [String],
     },
     { timestamps: true, collection: 'project' }
 );

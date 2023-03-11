@@ -19,6 +19,7 @@ module.exports.getAllDoctors = getAllDoctors;
 module.exports.update = update;
 module.exports.getById = getById;
 module.exports.getAll = getAll;
+module.exports.create = create;
 
 /**
  * @async
@@ -184,11 +185,7 @@ async function changePassword(req, res) {
     try {
         const { mobile, otp, newPassword } = req.body;
 
-        await userService.changePassword(
-            mobile,
-            otp,
-            newPassword
-        );
+        await userService.changePassword(mobile, otp, newPassword);
         res.json(utils.formatResponse(1));
     } catch (err) {
         console.error('Error on register handler: ', err);
@@ -265,6 +262,17 @@ async function getAll(req, res) {
         res.json(utils.formatResponse(1, users));
     } catch (err) {
         console.error('Error on user getAll handler: ', err);
+        res.json(utils.formatResponse(0, err));
+    }
+}
+
+async function create(req, res) {
+    try {
+        let user = req.body;
+        user = await userService.create(user);
+        res.json(utils.formatResponse(1, user));
+    } catch (err) {
+        console.error('Error on createUser handler: ', err);
         res.json(utils.formatResponse(0, err));
     }
 }

@@ -7,6 +7,8 @@ const axios = require('axios');
 const User = require('../models/user');
 const userAuth = require('../models/userAuth');
 
+const resellerService = require('../services/resellerService');
+
 // public interface
 module.exports.register = register;
 module.exports.auth = auth;
@@ -23,6 +25,7 @@ module.exports.OTPAuth = OTPAuth;
 module.exports.getById = getById;
 module.exports.generateRegisterOTP = generateRegisterOTP;
 module.exports.getAll = getAll;
+module.exports.create = create;
 
 /**
  * @async
@@ -34,7 +37,7 @@ module.exports.getAll = getAll;
  * @param {*} role
  * @returns
  */
-async function register(name, email, mobile, password, role = 'customer') {
+async function register(name, email, mobile, password, role = 'reseller') {
     try {
         // email check
         let emailFound = email && (await User.findOne({ email }));
@@ -142,7 +145,7 @@ async function generateRegisterOTP(
     email,
     name,
     password,
-    role = 'customer'
+    role = 'reseller'
 ) {
     try {
         let emailFound = email && (await User.findOne({ email }));
@@ -395,6 +398,14 @@ async function getAll() {
 async function create(user) {
     try {
         if (!user) throw 'required data missing';
+
+        // email check
+        let emailFound =
+            user.email && (await User.findOne({ email: user.email }));
+        let mobileFound =
+            user.mobile && (await User.findOne({ mobile: user.mobile }));
+
+        if (emailFound || mobileFound) throw 'User already registered';
 
         user = new User(user);
         user.password = await bcrypt.hash(user.password, 10);
